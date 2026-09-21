@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Node
+node_modules/
+build/
+.DS_Store
+
+# Model artifacts are tracked intentionally in this project,
+# but logs and caches are not
+*.log
+.cache/
+
+# runtime data (persisted review history - keep out of version control,
+# but the app itself will recreate this file automatically)
+backend/data/history.db

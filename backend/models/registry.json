@@ -1,0 +1,13 @@
+{
+  "model": "cnn",
+  "display_name": "CNN (Conv1D + Embeddings)",
+  "path": "models/cnn",
+  "accuracy": 0.9963617463617463,
+  "weighted_f1": 0.9963617463617463,
+  "classes": [
+    "Negative",
+    "Neutral",
+    "Positive"
+  ],
+  "status": "ready"
+}
