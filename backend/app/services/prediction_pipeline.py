@@ -592,3 +592,28 @@ def resolve_sentiment(raw_review: str):
         return "Neutral", cleaned
 
     return None, cleaned
+
+
+def fallback_sentiment(text: str):
+    """Classify text without TensorFlow for low-memory deployments."""
+    compound = _vader.polarity_scores(text)["compound"]
+    if compound >= 0.05:
+        label = "Positive"
+    elif compound <= -0.05:
+        label = "Negative"
+    else:
+        label = "Neutral"
+
+    strength = min(abs(compound), 1.0)
+    confidence = strength if label != "Neutral" else 1.0 - strength
+    probabilities = {
+        "Positive": 0.0,
+        "Neutral": 0.0,
+        "Negative": 0.0,
+    }
+    probabilities[label] = confidence
+    remaining = 1.0 - confidence
+    other_labels = [name for name in probabilities if name != label]
+    for name in other_labels:
+        probabilities[name] = remaining / len(other_labels)
+    return label, confidence, probabilities

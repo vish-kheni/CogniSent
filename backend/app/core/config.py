@@ -15,6 +15,7 @@ class Settings:
 
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", 8000))
+    USE_CNN: bool = os.getenv("USE_CNN", "false").lower() in {"1", "true", "yes"}
 
     CORS_ORIGINS: list = os.getenv(
         "CORS_ORIGINS", "http://localhost:3000"

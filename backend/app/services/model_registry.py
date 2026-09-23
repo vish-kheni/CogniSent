@@ -12,10 +12,8 @@ import json
 import pickle
 import threading
 
-import numpy as np
-
 from app.core.config import settings
-from app.services.prediction_pipeline import resolve_sentiment
+from app.services.prediction_pipeline import fallback_sentiment, resolve_sentiment
 
 _lock = threading.Lock()
 
@@ -28,6 +26,8 @@ class CNNModel:
         self.metadata = metadata
 
     def predict(self, text: str) -> dict:
+        import numpy as np
+
         rule_label, cleaned = resolve_sentiment(text)
 
         if rule_label is not None:
@@ -58,6 +58,28 @@ class CNNModel:
         }
 
 
+class RuleBasedModel:
+    """Low-memory inference used by the Render free instance."""
+
+    def predict(self, text: str) -> dict:
+        rule_label, cleaned = resolve_sentiment(text)
+        if rule_label is not None:
+            label = rule_label
+            confidence = 1.0
+            probabilities = {
+                name: (1.0 if name == label else 0.0)
+                for name in ("Negative", "Neutral", "Positive")
+            }
+        else:
+            label, confidence, probabilities = fallback_sentiment(cleaned)
+
+        return {
+            "label": label,
+            "confidence": confidence,
+            "probabilities": probabilities,
+        }
+
+
 class ModelRegistry:
     """Lazily loads the CNN model on first use and caches it in memory."""
 
@@ -72,7 +94,14 @@ class ModelRegistry:
         return self._registry
 
     def info(self) -> dict:
-        return self._load_registry()
+        info = dict(self._load_registry())
+        if not settings.USE_CNN:
+            info.update(
+                model="vader",
+                display_name="VADER (low-memory mode)",
+                status="ready",
+            )
+        return info
 
     def get(self) -> CNNModel:
         with _lock:
@@ -80,6 +109,10 @@ class ModelRegistry:
                 return self._model
 
             registry = self._load_registry()
+            if not settings.USE_CNN:
+                self._model = RuleBasedModel()
+                return self._model
+
             model_dir = (settings.MODELS_DIR / ".." / registry["path"]).resolve()
             metadata = json.load(open(model_dir / "metadata.json"))
 

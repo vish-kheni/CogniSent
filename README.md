@@ -50,6 +50,16 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+The serving requirements use the lightweight VADER/rule-based inference
+path by default so the backend can run on a 512 MB Render instance. Set
+`USE_CNN=true` only on a larger instance after installing
+`requirements-training.txt` instead.
+
+For Render, create a Python web service with `backend` as its root directory,
+`pip install -r requirements.txt` as its build command, and
+`uvicorn app.main:app --host 0.0.0.0 --port $PORT` as its start command. Set
+`CORS_ORIGINS` to the deployed frontend URL.
+
 The CNN model is preloaded at startup — wait for `Application startup
 complete` before using the frontend. Check it's alive at
 http://localhost:8000/docs.
@@ -73,6 +83,7 @@ REACT_APP_API_URL=http://localhost:8000/api
 
 ```bash
 cd backend
+pip install -r requirements-training.txt
 python scripts/augment_data.py   # regenerates the augmented dataset
 python scripts/train_cnn.py      # retrains the CNN
 # or both at once:
