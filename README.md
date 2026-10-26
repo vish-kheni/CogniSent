@@ -49,6 +49,13 @@ python -m venv .venv
 pip install -r requirements.txt
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+vnv changed
+
+Set-Location "C:\Users\Vishwa Kheni\OneDrive\Desktop\CogniSent\backend"
+>> .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+Set-Location "C:\Users\Vishwa Kheni\OneDrive\Desktop\CogniSent\backend"
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 The serving requirements use the lightweight VADER/rule-based inference
 path by default so the backend can run on a 512 MB Render instance. Set

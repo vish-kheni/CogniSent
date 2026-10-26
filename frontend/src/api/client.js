@@ -5,7 +5,7 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api
 const client = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 60000,
+  timeout: 1200000,
 });
 
 export const analyzeReview = (text, sessionId) =>
